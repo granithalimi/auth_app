@@ -1,4 +1,5 @@
 "use server";
+import { cookies } from "next/headers";
 import { supabase } from "./supabase";
 import { redirect } from "next/navigation";
 
@@ -16,6 +17,15 @@ export async function signin(formData: FormData) {
     redirect("/login")
   }
   if (data) console.log(data);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const cookieStore = await cookies()
+  cookieStore.set('session', data.session.access_token, {
+    httpOnly: true,
+    secure: true,
+    expires: expiresAt,
+    sameSite: 'lax',
+    path: '/',
+  })
 
   redirect("/");
 }
